@@ -62,4 +62,68 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+    // Ver perfil
+public function perfil(Request $request)
+{
+    return response()->json($request->user());
+}
+
+// Editar datos generales
+public function actualizarPerfil(Request $request)
+{
+    $user = $request->user();
+
+    $request->validate([
+        'name'  => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'phone' => 'nullable|string|max:20',
+    ]);
+
+    $user->update([
+        'name'  => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+    ]);
+
+    return response()->json([
+        'message' => 'Perfil actualizado correctamente',
+        'user'    => $user
+    ]);
+}
+
+// Actualizar imagen de perfil
+public function actualizarImagen(Request $request)
+{
+    $request->validate([
+        'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    $user = $request->user();
+    $path = $request->file('foto')->store('perfiles', 'public');
+    $user->update(['foto' => asset('storage/' . $path)]);
+
+    return response()->json([
+        'message' => 'Imagen actualizada correctamente',
+        'foto'    => $user->foto
+    ]);
+}
+
+// Actualizar contraseña
+public function actualizarPassword(Request $request)
+{
+    $request->validate([
+        'password_actual' => 'required',
+        'password_nuevo'  => 'required|min:6|confirmed',
+    ]);
+
+    $user = $request->user();
+
+    if (!Hash::check($request->password_actual, $user->password)) {
+        return response()->json(['error' => 'La contraseña actual es incorrecta'], 400);
+    }
+
+    $user->update(['password' => Hash::make($request->password_nuevo)]);
+
+    return response()->json(['message' => 'Contraseña actualizada correctamente']);
+}
 }

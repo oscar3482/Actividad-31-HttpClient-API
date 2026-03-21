@@ -18,6 +18,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
+    // Perfil
+    Route::get('/perfil', [AuthController::class, 'perfil']);
+    Route::put('/perfil', [AuthController::class, 'actualizarPerfil']);
+    Route::post('/perfil/imagen', [AuthController::class, 'actualizarImagen']);
+    Route::put('/perfil/password', [AuthController::class, 'actualizarPassword']);
+
     // Pedidos
     Route::get('/pedidos', [PedidoController::class, 'index']);
     Route::post('/pedidos', [PedidoController::class, 'store']);
